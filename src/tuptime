@@ -621,9 +621,8 @@ def time_conv(secs):
     return str(line[:-1])
 
 def humanize_seconds(sec):
-    """Convert seconds to human readable style"""
-    # yr = sec // 31536000
-    # sec -= yr * 31536000
+    """Convert seconds to human readable style fast and zero-padding"""
+
     d = sec // 86400
     sec -= d * 86400
     h = sec // 3600
