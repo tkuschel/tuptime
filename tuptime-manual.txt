@@ -287,9 +287,9 @@ These are the command line options, no configuration file is used:
   strftime(3) documentation.
 
   Examples:
-         tuptime -d '%X %x'  # (locale by default)
-         tuptime -d '%H:%M:%S   %m-%d-%Y'  # MDY style
-         tuptime -d '%H:%M:%S   %d-%b-%Y'  # DMY style
+         tuptime -d '%x %X'  # (locale by default)
+         tuptime -d '%m-%d-%Y %H:%M:%S'  # MDY style
+         tuptime -d '%d-%b-%Y %H:%M:%S'  # DMY style
 
 
 -e DECIMALS, --dec DECIMALS

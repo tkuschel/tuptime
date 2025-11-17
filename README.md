@@ -1,18 +1,19 @@
 tuptime
 =======
 
-Tuptime reports the historical and statistical real time of the system, preserving it between restarts. Like uptime command, but with more interesting output.
+Tuptime reports the historical and statistical real-time statistics about the system and preserves them between restarts.
+It's like the uptime command, but with more interesting output.
 
 
 ### Sample output
 
 Just after install:
 
-	System startups:        1  since  21:54:09 24/09/15
+	System startups:        1  06/21/2025 05:21:07 PM
 	System shutdowns:       0 ok  +  0 bad
 	System life:            21m 30s
 
-	Longest uptime:         21m 30s  from  21:54:09 24/09/15
+	Longest uptime:         21m 30s  from  06/21/2025 05:21:07 PM
 	Average uptime:         21m 30s
 	System uptime:          100.0%  =  21m 30s
 
@@ -20,51 +21,50 @@ Just after install:
 	Average downtime:       0s
 	System downtime:        0.0%  =  0s
 
-	Current uptime:         21m 30s  since  21:54:09 24/09/15
+	Current uptime:         21m 30s  since  06/21/2025 05:21:07 PM
 
-A few days later:
+Several days later:
 
-	System startups:        110  since  10:15:27 08/08/15
-	System shutdowns:       107 ok  +  2 bad
-	System life:            47d 12h 2m 15s
+	System startups: 	4  since  06/21/2025 05:21:07 PM
+	System shutdowns: 	3 ok  +  0 bad
+	System life: 	        149d 5h 45m 32s
 
-	Longest uptime:         2h 10m 44s  from  20:49:17 09/08/15
-	Average uptime:         25m 8s
-	System uptime:          4.04%  =  1d 22h 4m 44s
+	Longest uptime: 	60d 22h 23m 6s  from  06/21/2025 05:21:07 PM
+	Average uptime: 	37d 7h 26m 14s
+	System uptime: 	        100.0%  =  149d 5h 44m 57s
 
-	Longest downtime:	7d 10h 17m 26s  from  06:09:45 10/08/15
-	Average downtime:       9h 56m 42s
-	System downtime:        95.96%  =  45d 13h 57m 30s
+	Longest downtime: 	14s  from  08/21/2025 03:44:13 PM
+	Average downtime: 	12s
+	System downtime: 	0.0%  =  35s
 
-	Current uptime:         23m 33s  since  21:54:09 24/09/15
+	Current uptime: 	54d 8h 55m 33s  since  09/24/2025 02:11:06 PM
 
 Swich to -t | --table option:
 
-	No.        Startup T.        Uptime         Shutdown T.   End    Downtime
-                                                                                                                                    
-	1   10:15:27 08/08/15           42s   10:16:09 08/08/15    OK         16s
-	2   10:16:26 08/08/15           49s   10:17:15 08/08/15    OK         16s
-	3   10:17:32 08/08/15        5m 47s   10:23:19 08/08/15    OK         16s
-	4   10:23:36 08/08/15            9s   10:23:45 08/08/15   BAD         42s
-	5   10:24:28 08/08/15     2h 9m 27s   12:33:55 08/08/15    OK     41m 44s
+    No.              Startup T.           Uptime             Shutdown T.  End  Downtime
+      1  06/21/2025 05:21:07 PM  60d 22h 23m 06s  08/21/2025 03:44:13 PM  OK        14s
+      2  08/21/2025 03:44:27 PM  17d 05h 14m 36s  09/07/2025 08:59:03 PM  OK        11s
+      3  09/07/2025 08:59:14 PM  16d 17h 11m 42s  09/24/2025 02:10:56 PM  OK        10s
+      4  09/24/2025 02:11:06 PM  54d 09h 07m 11s  11/17/2025 10:20:17 PM  BAD    3m 48s
+      5  11/17/2025 10:24:05 PM       1h 03m 44s
         . . .
 
 Or swich to -l | --list option:
 
-	Startup:  1  at  10:15:27 08/08/15
-	Uptime:   42s
-	Shutdown: OK  at  10:16:09 08/08/15
-	Downtime: 16s
-
-	Startup:  2  at  10:16:26 08/08/15
-	Uptime:   49s
-	Shutdown: OK  at  10:17:15 08/08/15
-	Downtime: 16s
-
-	Startup:  3  at  10:17:32 08/08/15
-	Uptime:   5m 47s
-	Shutdown: OK  at  10:23:19 08/08/15
-	Downtime: 16s
+    Startup:  1  at  06/21/2025 05:21:07 PM
+    Uptime:   60d 22h 23h 06s
+    Shutdown: OK  at  08/21/2025 03:44:13 PM
+    Downtime: 14s
+    
+    Startup:  2  at  08/21/2025 03:44:27 PM
+    Uptime:   17d 05h 14h 36s
+    Shutdown: OK  at  09/07/2025 08:59:03 PM
+    Downtime: 11s
+   
+    Startup:  3  at  09/07/2025 08:59:14 PM
+    Uptime:   16d 17h 11h 42s
+    Shutdown: OK  at  09/24/2025 02:10:56 PM
+    Downtime: 10s
 	. . .
 
 
