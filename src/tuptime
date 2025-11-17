@@ -621,21 +621,17 @@ def time_conv(secs):
     return str(line[:-1])
 
 def humanize_seconds(sec):
-    """Convert seconds to human readable style fast and zero-padding"""
+    """Convert seconds to human readable style fast and zero-padding internally,
+    but without leading zero in the first unit."""
 
-    d = sec // 86400
-    sec -= d * 86400
-    h = sec // 3600
-    sec -= h * 3600
-    m = sec // 60
-    s = sec - m * 60
-    
+    units = [('d', 86400), ('h', 3600), ('m', 60), ('s', 1),]
     parts = []
-    if  d: parts.append(f"{d}d")
-    if  h or parts: parts.append(f"{h:02d}h")
-    if  m or parts: parts.append(f"{m:02d}h")
-    parts.append(f"{s:02d}s")
-
+    first = True
+    for suffix, u in units:
+        value, sec = divmod(sec, u)
+        if value > 0 or parts:
+            parts.append(f"{value}{suffix}" if first else f"{value:02d}{suffix}")
+            first = False
     return " ".join(parts)
 
 def trim_rows(db_rows, sis, last_st, arg):
@@ -814,12 +810,43 @@ def print_list(db_rows, arg):
 
 
 def print_table(db_rows, arg):
-    """Print values as a table"""
+    """
+    Display a list of database rows as a formatted table or CSV.
 
-    tops = {'startup': 'No.', 'bootid': 'Boot ID', 'btime': 'Startup T.', 'uptime': 'Uptime', 'rntime': 'Running', 'slptime': 'Sleeping',
-            'offbtime': 'Shutdown T.', 'endst': 'End', 'downtime': 'Downtime', 'kernel': 'Kernel'}
-    side_spaces = 3
+    The table automatically adjusts column spacing for readability,
+    right-aligns numeric/standard columns, and left-aligns specific
+    columns like 'End' or 'Kernel'. The function can also output
+    the same data as CSV when requested.
 
+    Parameters:
+    -----------
+    db_rows : list of dict
+        The database rows to display. Each dict represents a row,
+        with keys corresponding to the column names.
+    arg : object
+        An object with optional flags:
+        - arg.csv : bool, if True, output CSV instead of formatted table
+        - arg.bootid : bool, include 'Boot ID' column if True
+        - arg.power : bool, include 'Running'/'Sleeping' columns if True
+        - arg.kernel : bool, include 'Kernel' column if True
+
+    Returns:
+    --------
+    None
+        The function prints the table to stdout; it does not return anything.
+    """
+
+    tops = {'startup': 'No.',
+            'bootid': 'Boot ID',
+            'btime': 'Startup T.',
+            'uptime': 'Uptime',
+            'rntime': 'Running',
+            'slptime': 'Sleeping',
+            'offbtime': 'Shutdown T.',
+            'endst': 'End',
+            'downtime': 'Downtime',
+            'kernel': 'Kernel'}
+    
     # Remove unused optional values
     if not arg.bootid:
         tops.pop('bootid')
@@ -831,49 +858,33 @@ def print_table(db_rows, arg):
     if not arg.kernel:
         tops.pop('kernel')
 
-    # Assign remaining values for print the header
-    tbl = [tuple(tops.values())]
+    keys = list(tops.keys())
+    headers = list(tops.values())
 
-    # Add empty brake up line if csv is not used
-    if not arg.csv:
-        tbl.append(tuple(' ') * len(tbl[0]))
-
-    # Assign table values for print
-    for row_dict in format_output(db_rows, arg):
-        rowd = tuple(row_dict[i] for i in tops)
-        tbl.append(rowd)
+    # Prepare table rows
+    table = [[row[k] for k in keys] for row in format_output(db_rows, arg)]
+    table.insert(0, headers) # add headers as first row
 
     # Print table values
     if arg.csv:
-        for row in tbl:
-            for key, value in enumerate(row):
-                sys.stdout.write('"' + str(value) + '"')
-                if (key + 1) != len(row):
-                    sys.stdout.write(',')
-            print('')
+        for row in table:
+            print(','.join(f'"{v}"' for v in row))
+        return
+    
+    # Determine column width
+    col_width = [max([len(str(row[i])) for row in table]) for i in range(len(headers))]
+    side_spaces = 3 if sum(col_width) + 3 * (len(col_width) -1) < 80 else 2
+    spacing = ' ' * side_spaces # fixed spacing between all columns
+     
+    # Columns to left-align
+    align_left = [i for i, h in enumerate(headers) if h in ('End', 'Kernel')]
 
-    else:
-        # Get index position of elements left aligned
-        align_left = [tbl[0].index(i) for i in ('End', 'Kernel') if i in tbl[0]]
-
-        # Get the maximum width of the given column index
-        colpad = [max([len(str(row[i])) for row in tbl]) for i in range(len(tbl[0]))]
-
-        # Print cols by row
-        for row in tbl:
-
-            # Convert the entire row to strings
-            row = [str(cell) for cell in row]
-
-            # First in raw and next ones with side spaces
-            sys.stdout.write(row[0].rjust(colpad[0]))
-            for i in range(1, len(row)):
-                if i in align_left:
-                    col = (side_spaces * ' ') + row[i].ljust(colpad[i])
-                else:
-                    col = row[i].rjust(colpad[i] + side_spaces)
-                sys.stdout.write(col)
-            print('')
+    # Print table in a single loop
+    for row in table:
+        print(spacing.join(
+            str(cell).ljust(col_width[i]) if i in align_left else str(cell).rjust(col_width[i])
+            for i, cell in enumerate(row)
+        ))
 
 
 def print_tat(db_rows, sis, last_st, arg):
