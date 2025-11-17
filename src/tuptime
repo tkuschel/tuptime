@@ -1286,19 +1286,5 @@ def main():
 
         output_hub(db_rows, sis, arg)
 
-    # Performance measuring
-    start = time.perf_counter()
-    for i in range(100000):
-        humanize_seconds(71526354)
-    end = time.perf_counter()
-
-    print(f"Laufzeit(fast): {end-start:.6f} seconds")
-    start = time.perf_counter()
-    for i in range(100000):
-        time_conv(71526354)
-    end = time.perf_counter()
-    print(f"Laufzeit(convential): {end-start:.6f} seconds")
-
-
 if __name__ == "__main__":
     main()
