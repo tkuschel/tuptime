@@ -621,8 +621,10 @@ def time_conv(secs):
     return str(line[:-1])
 
 def humanize_seconds(sec):
-    """Convert seconds to human readable style fast and zero-padding internally,
-    but without leading zero in the first unit."""
+    """
+    Convert seconds to human readable style fast and zero-padding internally,
+    but without leading zero in the first unit.
+    """
 
     units = [('d', 86400), ('h', 3600), ('m', 60), ('s', 1),]
     parts = []
@@ -632,7 +634,7 @@ def humanize_seconds(sec):
         if value > 0 or parts:
             parts.append(f"{value}{suffix}" if first else f"{value:02d}{suffix}")
             first = False
-    return " ".join(parts)
+    return "0s" if not parts else " ".join(parts)
 
 def trim_rows(db_rows, sis, last_st, arg):
     """Report rows since or until a given startup number or timestamp
@@ -877,7 +879,7 @@ def print_table(db_rows, arg):
     spacing = ' ' * side_spaces # fixed spacing between all columns
      
     # Columns to left-align
-    align_left = [i for i, h in enumerate(headers) if h in ('End', 'Kernel')]
+    align_left = [i for i, h in enumerate(headers) if h in ('End', 'Kernel', 'Boot ID')]
 
     # Print table in a single loop
     for row in table:
