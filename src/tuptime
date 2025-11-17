@@ -620,6 +620,24 @@ def time_conv(secs):
     # Return without last space char
     return str(line[:-1])
 
+def humanize_seconds(sec):
+    """Convert seconds to human readable style"""
+    # yr = sec // 31536000
+    # sec -= yr * 31536000
+    d = sec // 86400
+    sec -= d * 86400
+    h = sec // 3600
+    sec -= h * 3600
+    m = sec // 60
+    s = sec - m * 60
+    
+    parts = []
+    if  d: parts.append(f"{d}d")
+    if  h or parts: parts.append(f"{h:02d}h")
+    if  m or parts: parts.append(f"{m:02d}h")
+    parts.append(f"{s:02d}s")
+
+    return " ".join(parts)
 
 def trim_rows(db_rows, sis, last_st, arg):
     """Report rows since or until a given startup number or timestamp
@@ -731,7 +749,8 @@ def format_output(db_rows, arg):
         else:
             if not arg.seconds:
                 for key in ('uptime', 'rntime', 'slptime'):
-                    row[key] = time_conv(row[key])
+                    # row[key] = time_conv(row[key])
+                    row[key] = humanize_seconds(row[key])
 
         if row['endst'] is False:
             row['endst'] = ''
@@ -1266,6 +1285,19 @@ def main():
         db_conn.close()
 
         output_hub(db_rows, sis, arg)
+
+    # Performance measuring
+    start = time.perf_counter()
+    for i in range(100000):
+        humanize_seconds(71526354)
+    end = time.perf_counter()
+
+    print(f"Laufzeit(fast): {end-start:.6f} seconds")
+    start = time.perf_counter()
+    for i in range(100000):
+        time_conv(71526354)
+    end = time.perf_counter()
+    print(f"Laufzeit(convential): {end-start:.6f} seconds")
 
 
 if __name__ == "__main__":
