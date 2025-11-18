@@ -620,21 +620,73 @@ def time_conv(secs):
     # Return without last space char
     return str(line[:-1])
 
-def humanize_seconds(sec):
+def humanize_seconds(sec, pad=True, show_zeros=True):
     """
-    Convert seconds to human readable style fast and zero-padding internally,
-    but without leading zero in the first unit.
-    """
+    Convert seconds to a human-readable duration string.
 
-    units = [('d', 86400), ('h', 3600), ('m', 60), ('s', 1),]
-    parts = []
+    Parameters
+    ----------
+    sec : int
+        Number of seconds.
+    pad : bool
+        If True, pad all units after the first with zeros.
+    show_zeros : bool
+        If True, show zero-values for smaller units; if False, omit them.
+
+    Returns
+    -------
+    str
+        Human-readable duration.
+
+    Examples
+    --------
+    >>> humanize_seconds(0)
+    '0s'
+    >>> humanize_seconds(5)
+    '5s'
+    >>> humanize_seconds(60)
+    '1m 00s'
+    >>> humanize_seconds(3600)
+    '1h 00m 00s'
+    >>> humanize_seconds(3661)
+    '1h 01m 01s'
+    >>> humanize_seconds(3600, pad=False)
+    '1h 0m 0s'
+    >>> humanize_seconds(3600, pad=False, show_zeros=False)
+    '1h'
+    >>> humanize_seconds(7322, pad=False)
+    '2h 2m 2s'
+    humanize_seconds(3601, pad=True, show_zeros=True)   # '1h 00m 01s'
+    humanize_seconds(3601, pad=True, show_zeros=False)  # '1h 01s'
+    humanize_seconds(3601, pad=False, show_zeros=True)  # '1h 0m 1s'
+    humanize_seconds(3601, pad=False, show_zeros=False) # '1h 1s'
+    """
+    units = [('d', 86400), ('h', 3600), ('m', 60), ('s', 1)]
+
+    # compute all unit values
+    values = []
+    for _, u in units:
+        v, sec = divmod(sec, u)
+        values.append(v)
+
+    # find first non-zero unit
+    start = next((i for i, v in enumerate(values) if v), len(values)-1)
+
+    out = []
     first = True
-    for suffix, u in units:
-        value, sec = divmod(sec, u)
-        if value > 0 or parts:
-            parts.append(f"{value}{suffix}" if first else f"{value:02d}{suffix}")
+    for (suffix, _), v in zip(units[start:], values[start:]):
+        if first:
+            out.append(f"{v}{suffix}")
             first = False
-    return "0s" if not parts else " ".join(parts)
+        else:
+            if pad:
+                if show_zeros or v != 0:
+                    out.append(f"{v:02d}{suffix}")
+            else:
+                if show_zeros or v != 0:
+                    out.append(f"{v}{suffix}")
+
+    return "0s" if not out else " ".join(out)
 
 def trim_rows(db_rows, sis, last_st, arg):
     """Report rows since or until a given startup number or timestamp
